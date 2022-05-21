@@ -182,26 +182,26 @@ public class BotCore{
         ArrayList<InvokeObject> invokeObjects = new ArrayList<>();
         for (Listener listener : listeners) {
             for (Method method : listener.getClass().getMethods()) {
-                if (method.getParameterCount() != 1) {
+                if (method.getParameterCount() != 1) {//Listener的处理函数仅允许1个参数(接收的消息对象)
                     continue;
                 }
                 EventHandler eventHandler = method.getAnnotation(EventHandler.class);
-                if (eventHandler == null) {
+                if (eventHandler == null) {//Listener的处理函数必须有EventHandler注解
                     continue;
                 }
-                if (!method.getParameterTypes()[0].isInstance(event)) {
+                if (!method.getParameterTypes()[0].isInstance(event)) {//Listener的处理函数的唯一参数必须继承lrk.mirairobot.event.Event
                     continue;
                 }
-                if (!Modifier.isPublic(method.getModifiers())) {
+                if (!Modifier.isPublic(method.getModifiers())) {//Listener的处理函数必须使用public访问修饰符
                     continue;
                 }
-                invokeObjects.add(new InvokeObject(listener, method));
+                invokeObjects.add(new InvokeObject(listener, method));//添加到列表中(InvokeObject代表一个Listener的一个处理函数,即一个事件)
             }
         }
-        invokeObjects.sort(Comparator.comparingInt(InvokeObject::getPriority));
+        invokeObjects.sort(Comparator.comparingInt(InvokeObject::getPriority));//通过EventHandler的参数获取事件优先级并排序
 
         for (InvokeObject object : invokeObjects) {
-            if (event.isCancelled() && object.isIgnoreCancelled()) {
+            if (event.isCancelled() && object.isIgnoreCancelled()) {//可以通过event.isCancelled()取消事件,object.isIgnoreCancelled()可以无视取消任然执行,精妙的逻辑
                 continue;
             }
             object.invoke(event);
