@@ -13,23 +13,18 @@ import javax.imageio.ImageIO;
 import com.google.gson.*;
 
 public class 运势 implements Utils{
-    
-    private Font 微软雅黑,Sakura;
-    private final int font_title_size = 45,font_text_size = 25;
     private BufferedImage image;
-    private Color title_color,text_color;
-    private JsonArray title,text;
+    private final Color title_color,text_color;
+    private final JsonArray title,text;
     
     public 运势() throws FontFormatException,IOException{
-        微软雅黑 = Font.createFont(Font.TRUETYPE_FONT,运势.class.getResourceAsStream("/assets/font/微软雅黑.ttf"));//.deriveFont(font_title_size);
-        Sakura = Font.createFont(Font.TRUETYPE_FONT,运势.class.getResourceAsStream("/assets/font/Sakura.ttf"));//.deriveFont(font_text_size);
-        image = ImageIO.read(运势.class.getResourceAsStream("/assets/image/运势/frame_"+(int)(Math.random()*65+1)+".jpg"));
+        image = ImageIO.read(Objects.requireNonNull(运势.class.getResourceAsStream("/assets/image/运势/frame_" + (int) (Math.random() * 65 + 1) + ".jpg")));
         title_color = Color.decode("#F5F5F5");
         text_color = Color.decode("#323232");
         JsonObject tmp = (JsonObject)JsonParser.parseString(new String(运势.class.getResourceAsStream("/assets/json/运势/title.json").readAllBytes()));
         title = (JsonArray)tmp.get("types_of").getAsJsonArray();
         tmp = (JsonObject)JsonParser.parseString(new String(运势.class.getResourceAsStream("/assets/json/运势/text.json").readAllBytes()));
-        text = (JsonArray)tmp.get("copywriting").getAsJsonArray();
+        text = (JsonArray)tmp.get("text").getAsJsonArray();
         
     }
     
@@ -39,10 +34,9 @@ public class 运势 implements Utils{
         int luck = title_s.get("good-luck").getAsInt();
         String 运势 = title_s.get("name").getAsString();
         String 祝福 = "";
-        Iterator<JsonElement> iterator = text.iterator();
-        while(iterator.hasNext()){
-            JsonObject obj = (JsonObject)iterator.next();
-            if(obj.get("good-luck").getAsInt() == luck){
+        for (JsonElement jsonElement : text) {
+            JsonObject obj = (JsonObject) jsonElement;
+            if (obj.get("good-luck").getAsInt() == luck) {
                 祝福 = obj.get("content").getAsString();
                 break;
             }
@@ -68,7 +62,7 @@ public class 运势 implements Utils{
             }
         }
         //绘制Text
-        g.setFont(new Font("微软雅黑",Font.BOLD,25));
+        g.setFont(new Font("MiSans",Font.BOLD,25));
         g.setColor(text_color);
         drawString_s(g,85,200,祝福);
         return image;

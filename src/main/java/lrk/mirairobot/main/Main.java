@@ -1,12 +1,10 @@
 package lrk.mirairobot.main;
 
-import lrk.mirairobot.core.*;
+import lrk.mirairobot.core.BotCore;
 
 public class Main{
-	public static DataBridge Data;
-	public static void main(String args[]) throws Exception{
-		Data = DataBridge.getInstance();
-		BotCore core = new BotCore(DataBridge.getRobotProp("Port").split(":")[0],Integer.parseInt(DataBridge.getRobotProp("Port").split(":")[1]),"ABCDEFGHIJK",Long.parseLong(DataBridge.getRobotProp("QQ")));
+	public static void main(String[] args) throws Exception{
+		BotCore core = BotCore.getInstance();
 		if(core.addListener(new RobotMain())){
 			RobotNotification.Config("添加监听器:"+RobotMain.Name);
 		}

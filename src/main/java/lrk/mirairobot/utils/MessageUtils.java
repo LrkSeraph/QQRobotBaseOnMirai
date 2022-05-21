@@ -1,6 +1,6 @@
 package lrk.mirairobot.utils;
 
-import lrk.mirairobot.data.messagetype.*;
+import lrk.mirairobot.core.data.messagetype.*;
 import lrk.mirairobot.core.*;
 import com.google.gson.*;
 import java.io.File;

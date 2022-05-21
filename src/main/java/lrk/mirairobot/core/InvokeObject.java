@@ -1,6 +1,6 @@
 package lrk.mirairobot.core;
 
-import lrk.mirairobot.listener.EventHandler;
+import lrk.mirairobot.core.listener.EventHandler;
 
 import java.lang.reflect.Method;
 

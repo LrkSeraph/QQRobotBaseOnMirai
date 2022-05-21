@@ -1,176 +1,226 @@
 package lrk.mirairobot.core;
 
-import java.net.*;
-import java.io.*;
-import java.util.*;
-import java.lang.reflect.*;
-import com.google.gson.*;
-import java.nio.charset.*;
-import lrk.mirairobot.event.*;
-import lrk.mirairobot.listener.*;
-import lrk.mirairobot.main.*;
-import lrk.mirairobot.data.*;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import lrk.mirairobot.core.data.MessageFromType;
+import lrk.mirairobot.core.event.Event;
+import lrk.mirairobot.core.event.FriendMessageEvent;
+import lrk.mirairobot.core.event.GroupMessageEvent;
+import lrk.mirairobot.core.listener.EventHandler;
+import lrk.mirairobot.core.listener.Listener;
+import lrk.mirairobot.main.DataBridge;
+import lrk.mirairobot.main.RobotNotification;
 
-public class BotCore{
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Timer;
+import java.util.TimerTask;
 
-	String session = "";
-	String verifyKey = "";
-	String host = "";
-	int port;
-	long qq;
-	private ArrayList<Listener> listeners = new ArrayList<Listener>();
-	
-	Timer core = new Timer();
-	public BotCore(String host,int port,String verifyKey,long qq) throws Exception{
-		this.host = host;
-		this.port = port;
-		this.qq = qq;
-		this.verifyKey = verifyKey;
-		session = verify();
-		RobotNotification.Info("SessionKey:"+session);
-		if(bind().equals("success")){
-			RobotNotification.Info("绑定成功:QQ="+qq);
-		}else{
-			RobotNotification.Warnning("绑定失败:"+bind());
-			System.exit(1);
-		}
-		core.schedule(new TimerTask(){
-			@Override
-			public void run(){
-				int messageCount = 0;
-				try{
-    				if((messageCount = getMessageCount()) != 0){
-    					for(int i = 0;i < messageCount;i++){
-    						JsonObject message = getNextMessage();
-    						handleMessage(message);
-    					}
-    				}
-				}catch (Exception e){}
-			}
-		},0,100);
-	}
-	//登录验证
-	private String verify() throws IOException,MalformedURLException,ProtocolException{
-		URL url = new URL("http://" + host + ":" + port + "/verify");
+public class BotCore {
+
+    static BotCore instance;
+
+    static {
+        try {
+            instance = new BotCore(DataBridge.getRobotProp("Port").split(":")[0], Integer.parseInt(DataBridge.getRobotProp("Port").split(":")[1]), DataBridge.getRobotProp("MiraiApiHttpVerifyKey"), Long.parseLong(DataBridge.getRobotProp("QQ")));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private final ArrayList<Listener> listeners = new ArrayList<Listener>();
+    String session = "";
+    String verifyKey = "";
+    String host = "";
+    int port;
+    long qq;
+    Timer timer = new Timer();
+
+    private BotCore(String host, int port, String verifyKey, long qq) throws Exception {
+        this.host = host;
+        this.port = port;
+        this.qq = qq;
+        this.verifyKey = verifyKey;
+        session = verify();
+        RobotNotification.Info("SessionKey:" + session);
+        if (bind().equals("success")) {
+            RobotNotification.Info("绑定成功:QQ=" + qq);
+        } else {
+            RobotNotification.Warning("绑定失败:" + bind());
+            System.exit(1);
+        }
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                int messageCount = 0;
+                try {
+                    if ((messageCount = getMessageCount()) != 0) {
+                        for (int i = 0; i < messageCount; i++) {
+                            JsonObject message = getNextMessage();
+                            handleMessage(message);
+                        }
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+        }, 0, 100);
+    }
+
+    public static BotCore getInstance() {
+        return instance;
+    }
+
+    //登录验证
+    private String verify() throws IOException {
+        URL url = new URL("http://" + host + ":" + port + "/verify");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
         connection.setRequestProperty("Charset", "UTF-8");
-        connection.setRequestProperty("Connection", "Keep-Alive");
+        //connection.setRequestProperty("Connection", "Keep-Alive");
         connection.setUseCaches(false);
         JsonObject data = new JsonObject();
-        data.addProperty("verifyKey",verifyKey);
+        data.addProperty("verifyKey", verifyKey);
         connection.setDoOutput(true);
         connection.getOutputStream().write(data.toString().getBytes(StandardCharsets.UTF_8));
-        return (String)JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject().get("session").toString().replace("\"","");
-	}
-	//绑定SessionKey和QQ
-	private String bind() throws IOException,MalformedURLException,ProtocolException{
-		URL url = new URL("http://" + host + ":" + port + "/bind");
+        String result = JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject().get("session").toString().replace("\"", "");
+        connection.disconnect();
+        return result;
+    }
+
+    //绑定SessionKey和QQ
+    private String bind() throws IOException {
+        URL url = new URL("http://" + host + ":" + port + "/bind");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
         connection.setRequestProperty("Charset", "UTF-8");
-        connection.setRequestProperty("Connection", "Keep-Alive");
+        //connection.setRequestProperty("Connection", "Keep-Alive");
         connection.setUseCaches(false);
         JsonObject data = new JsonObject();
-        data.addProperty("sessionKey",session);
-        data.addProperty("qq",qq);
+        data.addProperty("sessionKey", session);
+        data.addProperty("qq", qq);
         connection.setDoOutput(true);
         connection.getOutputStream().write(data.toString().getBytes(StandardCharsets.UTF_8));
-        return (String)JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject().get("msg").toString().replace("\"","");
-	}
-	//获取下一条待处理的消息
-	public JsonObject getNextMessage() throws IOException,MalformedURLException,ProtocolException{
-		URL url = new URL("http://" + host + ":" + port + "/fetchMessage?sessionKey="+session+"&count=1");
+        String result = JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject().get("msg").toString().replace("\"", "");
+        connection.disconnect();
+        return result;
+    }
+
+    //获取下一条待处理的消息
+    public JsonObject getNextMessage() throws IOException {
+        URL url = new URL("http://" + host + ":" + port + "/fetchMessage?sessionKey=" + session + "&count=1");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
         connection.setRequestProperty("Charset", "UTF-8");
-        connection.setRequestProperty("Connection", "Keep-Alive");
+        //connection.setRequestProperty("Connection", "Keep-Alive");
         connection.setUseCaches(false);
         JsonObject result = JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
-        if(result.get("code").toString().equals("0")){
-        	return result;
-        }else{
-        	return null;
+        if (result.get("code").toString().equals("0")) {
+            connection.disconnect();
+            return result;
+        } else {
+            connection.disconnect();
+            return null;
         }
-	}
-	//获取队列中的消息数量
-	public int getMessageCount() throws IOException,MalformedURLException,ProtocolException{
-		URL url = new URL("http://" + host + ":" + port + "/countMessage?sessionKey="+session);
+    }
+
+    //获取队列中的消息数量
+    public int getMessageCount() throws IOException {
+        URL url = new URL("http://" + host + ":" + port + "/countMessage?sessionKey=" + session);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
         connection.setRequestProperty("Charset", "UTF-8");
-        connection.setRequestProperty("Connection", "Keep-Alive");
+        //connection.setRequestProperty("Connection", "Keep-Alive");
         connection.setUseCaches(false);
         JsonObject result = JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
-		if(result.get("code").toString().equals("0")){
-        	return Integer.parseInt(result.get("data").toString());
-        }else{
-        	return 0;
+        if (result.get("code").toString().equals("0")) {
+            connection.disconnect();
+            return Integer.parseInt(result.get("data").toString());
+        } else {
+            connection.disconnect();
+            return 0;
         }
-	}
-	//对收到的消息进行处理
-	private void handleMessage(JsonObject message){
-		MessageFromType messageFromType = MessageFromType.valueOf(message.get("data").getAsJsonArray().get(0).getAsJsonObject().get("type").getAsString());
-		JsonObject data = message.getAsJsonArray("data").get(0).getAsJsonObject();
-		switch(messageFromType){
-			case FriendMessage:{
-				callEvent(new FriendMessageEvent(this,data));
-				break;
-			}
-			case GroupMessage:{
-				callEvent(new GroupMessageEvent(this,data));
-				break;
-			}
-		}
-	}
-	//发送好友消息
-	public JsonObject sendFriendMessage(JsonObject data) throws IOException,MalformedURLException,ProtocolException{
-		URL url = new URL("http://" + host + ":" + port + "/sendFriendMessage");
+    }
+
+    //发送好友消息
+    public JsonObject sendFriendMessage(JsonObject data) throws IOException {
+        URL url = new URL("http://" + host + ":" + port + "/sendFriendMessage");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
         connection.setRequestProperty("Charset", "UTF-8");
-        connection.setRequestProperty("Connection", "Keep-Alive");
+        //connection.setRequestProperty("Connection", "Keep-Alive");
         connection.setUseCaches(false);
         connection.setDoOutput(true);
-        data.addProperty("sessionKey",session);
+        data.addProperty("sessionKey", session);
         connection.getOutputStream().write(data.toString().getBytes(StandardCharsets.UTF_8));
-        return JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
-	}
-	//发送群消息
-	public JsonObject sendGroupMessage(JsonObject data) throws IOException,MalformedURLException,ProtocolException{
-		URL url = new URL("http://" + host + ":" + port + "/sendGroupMessage");
+        JsonObject result = JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
+        connection.disconnect();
+        return result;
+    }
+
+    //发送群消息
+    public JsonObject sendGroupMessage(JsonObject data) throws IOException {
+        URL url = new URL("http://" + host + ":" + port + "/sendGroupMessage");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
         connection.setRequestProperty("Charset", "UTF-8");
-        connection.setRequestProperty("Connection", "Keep-Alive");
+        //connection.setRequestProperty("Connection", "Keep-Alive");
         connection.setUseCaches(false);
         connection.setDoOutput(true);
-        data.addProperty("sessionKey",session);
+        data.addProperty("sessionKey", session);
         connection.getOutputStream().write(data.toString().getBytes(StandardCharsets.UTF_8));
-        return JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
-	}
-	//戳一戳
-	public JsonObject nudge(JsonObject data) throws IOException,MalformedURLException,ProtocolException{
-		URL url = new URL("http://" + host + ":" + port + "/sendNudge");
+        JsonObject result = JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
+        connection.disconnect();
+        return result;
+    }
+
+    //戳一戳
+    public JsonObject nudge(JsonObject data) throws IOException {
+        URL url = new URL("http://" + host + ":" + port + "/sendNudge");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
         connection.setRequestProperty("Charset", "UTF-8");
-        connection.setRequestProperty("Connection", "Keep-Alive");
+        //connection.setRequestProperty("Connection", "Keep-Alive");
         connection.setUseCaches(false);
         connection.setDoOutput(true);
-        data.addProperty("sessionKey",session);
+        data.addProperty("sessionKey", session);
         connection.getOutputStream().write(data.toString().getBytes(StandardCharsets.UTF_8));
-        return JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
-	}
-	
-	public boolean addListener(Listener listener) {
+        JsonObject result = JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
+        connection.disconnect();
+        return result;
+    }
+
+    //对收到的消息进行处理
+    private void handleMessage(JsonObject message) {
+        MessageFromType messageFromType = MessageFromType.valueOf(message.get("data").getAsJsonArray().get(0).getAsJsonObject().get("type").getAsString());
+        JsonObject data = message.getAsJsonArray("data").get(0).getAsJsonObject();
+        switch (messageFromType) {
+            case FriendMessage: {
+                callEvent(new FriendMessageEvent(this, data));
+                break;
+            }
+            case GroupMessage: {
+                callEvent(new GroupMessageEvent(this, data));
+                break;
+            }
+        }
+    }
+
+    public boolean addListener(Listener listener) {
+        listener.OnEnabled();
         return listeners.add(listener);
     }
 
@@ -189,7 +239,7 @@ public class BotCore{
                 if (eventHandler == null) {//Listener的处理函数必须有EventHandler注解
                     continue;
                 }
-                if (!method.getParameterTypes()[0].isInstance(event)) {//Listener的处理函数的唯一参数必须继承lrk.mirairobot.event.Event
+                if (!method.getParameterTypes()[0].isInstance(event)) {//Listener的处理函数的唯一参数必须是event的实例
                     continue;
                 }
                 if (!Modifier.isPublic(method.getModifiers())) {//Listener的处理函数必须使用public访问修饰符
@@ -201,7 +251,7 @@ public class BotCore{
         invokeObjects.sort(Comparator.comparingInt(InvokeObject::getPriority));//通过EventHandler的参数获取事件优先级并排序
 
         for (InvokeObject object : invokeObjects) {
-            if (event.isCancelled() && object.isIgnoreCancelled()) {//可以通过event.isCancelled()取消事件,object.isIgnoreCancelled()可以无视取消任然执行,精妙的逻辑
+            if (event.isCancelled() && object.isIgnoreCancelled()) {//可以通过event.isCancelled()取消事件,object.isIgnoreCancelled()可以无视取消任然执行
                 continue;
             }
             object.invoke(event);
