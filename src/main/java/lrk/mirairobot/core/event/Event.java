@@ -4,8 +4,8 @@ import lrk.mirairobot.core.BotCore;
 import com.google.gson.JsonObject;
 
 public abstract class Event {
-    private BotCore botCore;
-    private JsonObject params;
+    private final BotCore botCore;
+    private final JsonObject params;
     private boolean cancelled;
 
     public Event(BotCore botCore, JsonObject params) {

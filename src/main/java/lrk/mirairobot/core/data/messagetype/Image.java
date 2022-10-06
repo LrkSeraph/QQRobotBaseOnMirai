@@ -6,11 +6,11 @@ import com.google.gson.*;
  * 消息中所携带的图片
  */
 public class Image extends Message{
-	private String type = "Image";
-	private String imageId;//图片ID
-	private String url;//图片URL
-	private String path;//图片本地路径
-	private String base64;//图片的Base64编码
+	private final String type = "Image";
+	private final String imageId;//图片ID
+	private final String url;//图片URL
+	private final String path;//图片本地路径
+	private final String base64;//图片的Base64编码
 	
 	public Image(String imageId,String url,String path,String base64){
 		this.imageId = imageId;

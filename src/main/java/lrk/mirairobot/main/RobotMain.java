@@ -7,6 +7,7 @@ import lrk.mirairobot.core.listener.EventHandler;
 import lrk.mirairobot.core.listener.Listener;
 import lrk.mirairobot.main.threads.FriendMessageThread;
 import lrk.mirairobot.main.threads.GroupMessageThread;
+
 public class RobotMain implements Listener {
     public static String Name = "RobotMain";
 
@@ -22,16 +23,21 @@ public class RobotMain implements Listener {
 
     @EventHandler
     public void onEvent(Event event) {
-        RobotNotification.Info("新事件:(" + event.getParams() + ")");
+        if (event instanceof FriendMessageEvent) {
+            RobotNotification.Info("FriendMessage: " + event.getParams());
+        } else if (event instanceof GroupMessageEvent) {
+            RobotNotification.Info("GroupMessage: " + event.getParams());
+        }
     }
 
     @EventHandler
     public void onFriendMessage(FriendMessageEvent event) {
         new FriendMessageThread(event).start();
     }
+
     @EventHandler
     public void onGroupMessage(GroupMessageEvent event) {
-    	new GroupMessageThread(event).start();
-	}
-	
+        new GroupMessageThread(event).start();
+    }
+
 }

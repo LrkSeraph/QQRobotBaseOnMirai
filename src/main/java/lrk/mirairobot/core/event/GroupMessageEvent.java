@@ -23,17 +23,17 @@ public class GroupMessageEvent extends MessageEvent {
     // 发送者群名片
     private final String senderNickName;
     //@ 到的用户ID
-    private final ArrayList<Long> atUsers = new ArrayList<Long>();
+    private final ArrayList<Long> atUsers = new ArrayList<>();
     //消息中的图片
-    private final ArrayList<Image> pictures = new ArrayList<Image>();
+    private final ArrayList<Image> pictures = new ArrayList<>();
+    //文字消息
+    private final StringBuilder message = new StringBuilder();
     // 消息顺序号(所有消息类型均有)
     private long messageId;
     // 消息发送时间(所有消息类型均有)
     private long messageTime;
     //App消息
     private App app;
-    //文字消息
-    private String message = "";
 
     public GroupMessageEvent(BotCore botCore, JsonObject data) {
         super(botCore, data);
@@ -52,7 +52,7 @@ public class GroupMessageEvent extends MessageEvent {
                     break;
                 }
                 case Plain: {
-                    message += messageData.get("text").getAsString();
+                    message.append(messageData.get("text").getAsString());
                     break;
                 }
                 case At: {
@@ -60,15 +60,13 @@ public class GroupMessageEvent extends MessageEvent {
                     break;
                 }
                 case Image: {
-                    pictures.add(new Image(messageData.get("imageId").getAsString(), messageData.get("url").getAsString(), messageData.get("path").getAsString(), messageData.get("base64").getAsString()));
+                    System.out.println(messageData.has("imageId") ? messageData.get("imageId").getAsString() : null);
+                    System.out.println(messageData.has("url") ? messageData.get("url").getAsString() : null);
+                    pictures.add(new Image(messageData.has("imageId") ? messageData.get("imageId").getAsString() : null, messageData.has("url") ? messageData.get("url").getAsString() : null, null, null));
                     break;
                 }
                 case App: {
                     app = new App(messageData.get("content").getAsString());
-                    try {
-                        reply(app);
-                    } catch (Exception ignored) {
-                    }
                 }
             }
         }
@@ -103,7 +101,7 @@ public class GroupMessageEvent extends MessageEvent {
     }
 
     public String getMessage() {
-        return message;
+        return message.toString();
     }
 
     public long getMessageId() {
@@ -122,8 +120,13 @@ public class GroupMessageEvent extends MessageEvent {
         return pictures;
     }
 
+    public App getApp() {
+        return app;
+    }
+
     @Override
     public String toString() {
         return "";
     }
+
 }

@@ -35,10 +35,8 @@ public class BotCore {
         }
     }
 
-    private final ArrayList<Listener> listeners = new ArrayList<Listener>();
-    String session = "";
-    String verifyKey = "";
-    String host = "";
+    private final ArrayList<Listener> listeners = new ArrayList<>();
+    String session, verifyKey, host;
     int port;
     long qq;
     Timer timer = new Timer();
@@ -59,7 +57,7 @@ public class BotCore {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                int messageCount = 0;
+                int messageCount;
                 try {
                     if ((messageCount = getMessageCount()) != 0) {
                         for (int i = 0; i < messageCount; i++) {
@@ -189,6 +187,40 @@ public class BotCore {
     //戳一戳
     public JsonObject nudge(JsonObject data) throws IOException {
         URL url = new URL("http://" + host + ":" + port + "/sendNudge");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+        connection.setRequestProperty("Charset", "UTF-8");
+        //connection.setRequestProperty("Connection", "Keep-Alive");
+        connection.setUseCaches(false);
+        connection.setDoOutput(true);
+        data.addProperty("sessionKey", session);
+        connection.getOutputStream().write(data.toString().getBytes(StandardCharsets.UTF_8));
+        JsonObject result = JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
+        connection.disconnect();
+        return result;
+    }
+
+    //撤回消息
+    public JsonObject recall(JsonObject data) throws IOException {
+        URL url = new URL("http://" + host + ":" + port + "/recall");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+        connection.setRequestProperty("Charset", "UTF-8");
+        //connection.setRequestProperty("Connection", "Keep-Alive");
+        connection.setUseCaches(false);
+        connection.setDoOutput(true);
+        data.addProperty("sessionKey", session);
+        connection.getOutputStream().write(data.toString().getBytes(StandardCharsets.UTF_8));
+        JsonObject result = JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
+        connection.disconnect();
+        return result;
+    }
+
+    //撤回消息
+    public JsonObject mute(JsonObject data) throws IOException {
+        URL url = new URL("http://" + host + ":" + port + "/mute");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
