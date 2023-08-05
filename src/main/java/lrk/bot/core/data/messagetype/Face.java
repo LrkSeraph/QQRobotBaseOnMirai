@@ -1,11 +1,14 @@
 package lrk.bot.core.data.messagetype;
-//表情消息
+
 import com.google.gson.*;
 
+//表情消息
+
+@SuppressWarnings("unused")
 public class Face extends Message{
 	private final String type = "Face";
-	private int faceId = 0;//表情编号
-	private String name = "";//表情拼音
+    private final int faceId;//表情编号
+    private final String name;//表情拼音
 	
 	public Face(int faceId,String name){
 		this.faceId = faceId;

@@ -2,13 +2,16 @@ package lrk.bot.core.data.messagetype;
 
 import com.google.gson.JsonObject;
 
+//语音消息
+
+@SuppressWarnings("unused")
 public class Voice extends Message {
 	private final String type = "Voice";
-	private String voiceId = "";//语音消息识别id
-	private String url = "";//语音URL
-	private String path = "null";//语音本地路径
-	private String base64 = "null";//语音的Base64编码
-	private long length;//语音长度(发送时可以不写)
+    private final String voiceId;//语音消息识别id
+    private final String url;//语音URL
+    private final String path;//语音本地路径
+    private final String base64;//语音的Base64编码
+    private final long length;//语音长度(发送时可以不写)
 
 	public Voice(String voiceId, String url, String path, String base64, long length) {
 		this.voiceId = voiceId;

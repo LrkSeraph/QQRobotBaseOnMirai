@@ -2,9 +2,12 @@ package lrk.bot.core.data.messagetype;
 
 import com.google.gson.JsonObject;
 
+//Json卡片消息
+
+@SuppressWarnings("unused")
 public class Json extends Message {
 	private final String type = "Json";
-	private String json = "";
+    private final String json;
 
 	public Json(String json) {
 		this.json = json;

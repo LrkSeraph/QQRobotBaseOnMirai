@@ -1,7 +1,10 @@
 package lrk.bot.core.data.messagetype;
-//应用消息(轻视频等)
+
 import com.google.gson.*;
 
+//应用消息(轻视频等)
+
+@SuppressWarnings("unused")
 public class App extends Message{
 	private final String type = "App";
 	private final String content;//内容
@@ -10,7 +13,6 @@ public class App extends Message{
 		this.content = content;
 		this.appContent = new JsonObject();
 		appContent.addProperty("content",content);
-		System.out.println(appContent);
 	}
 	
 	public String getContent(){

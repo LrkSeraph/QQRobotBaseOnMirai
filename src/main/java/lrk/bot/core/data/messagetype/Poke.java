@@ -2,24 +2,26 @@ package lrk.bot.core.data.messagetype;
 
 import com.google.gson.JsonObject;
 
+//戳一戳
 
+@SuppressWarnings("unused")
 public class Poke extends Message {
 	private final String type = "Poke";
-	private name name;
+    private final PokeType pokeType;
 
-	public Poke(name name) {
-		this.name = name;
+    public Poke(PokeType PokeType) {
+        this.pokeType = PokeType;
 	}
 	
 	public String getName(){
-		return (String)name.name();
+        return pokeType.name();
 	}
 	
 	@Override
 	public String toString() {
 		JsonObject data = new JsonObject();
 		data.addProperty("type",type);
-		data.addProperty("name",name.name());
+        data.addProperty("name", pokeType.name());
 		return data.toString();
 	}
 
@@ -27,11 +29,11 @@ public class Poke extends Message {
 	public JsonObject toJsonObject() {
 		JsonObject data = new JsonObject();
 		data.addProperty("type",type);
-		data.addProperty("name",name.name());
+        data.addProperty("name", pokeType.name());
 		return data;
 	}
-	
-	public enum name{
+
+    public enum PokeType {
 		Poke,//戳一戳
 		ShowLove,//比心
 		Like,//点赞

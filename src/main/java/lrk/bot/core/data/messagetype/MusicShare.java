@@ -2,15 +2,16 @@ package lrk.bot.core.data.messagetype;
 
 import com.google.gson.JsonObject;
 
+@SuppressWarnings("unused")
 public class MusicShare extends Message {
 	private final String type = "MusicShare";
-	private String kind = "";//类型(可能是音乐类型)
-	private String title = "";//音乐标题
-	private String summary = "";//概括
-	private String jumpUrl = "";//跳转URL
-	private String pictureUrl = "";//封面图片URL
-	private String musicUrl = "";//音源URL
-	private String brief = "";//简介
+    private final String kind;//类型(可能是音乐类型)
+    private final String title;//音乐标题
+    private final String summary;//概括
+    private final String jumpUrl;//跳转URL
+    private final String pictureUrl;//封面图片URL
+    private final String musicUrl;//音源URL
+    private final String brief;//简介
 
 	public MusicShare(String kind, String title, String summary, String jumpUrl, String pictureUrl, String musicUrl, String brief) {
 		this.kind = kind;

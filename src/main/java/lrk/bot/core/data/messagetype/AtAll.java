@@ -1,15 +1,14 @@
 package lrk.bot.core.data.messagetype;
-//@全体成员
+
 import com.google.gson.*;
 
+//@全体成员
+
+@SuppressWarnings("unused")
 public class AtAll extends Message{
 	private final String type = "AtAll";
-	
-	public AtAll(){
-		
-	}
-	
-	@Override
+
+    @Override
 	public String toString(){
 		JsonObject data = new JsonObject();
 		data.addProperty("type",type);

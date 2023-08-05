@@ -2,9 +2,12 @@ package lrk.bot.core.data.messagetype;
 
 import com.google.gson.JsonObject;
 
+//Xml卡片消息
+
+@SuppressWarnings("unused")
 public class Xml extends Message {
 	private final String type = "Xml";
-	private String xml = "";//XML消息内容
+    private final String xml;//XML消息内容
 
 	public Xml(String xml) {
 		this.xml = xml;

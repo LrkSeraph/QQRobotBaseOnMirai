@@ -5,6 +5,8 @@ import com.google.gson.*;
 /**
  * 消息中所携带的图片
  */
+
+@SuppressWarnings("unused")
 public class Image extends Message{
 	private final String type = "Image";
 	private final String imageId;//图片ID

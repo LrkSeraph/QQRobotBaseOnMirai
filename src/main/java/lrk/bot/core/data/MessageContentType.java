@@ -1,5 +1,6 @@
 package lrk.bot.core.data;
 
+@SuppressWarnings("unused")
 public enum MessageContentType {
    Source,//消息的时间,ID等信息
    Quote,//被引用的原消息

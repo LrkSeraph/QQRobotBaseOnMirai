@@ -2,10 +2,13 @@ package lrk.bot.core.data.messagetype;
 
 import com.google.gson.*;
 
+//纯文本消息
+
+@SuppressWarnings("unused")
 public class Plain extends Message{
 
 	private final String type = "Plain";
-	private String text;//文本内容
+    private final String text;//文本内容
 	
 	public Plain(String text){
 		this.text = text;

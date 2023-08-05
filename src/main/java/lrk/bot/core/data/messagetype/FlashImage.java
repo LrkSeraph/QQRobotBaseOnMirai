@@ -5,6 +5,8 @@ import com.google.gson.JsonObject;
 /**
  * 消息中所携带的闪照
  */
+
+@SuppressWarnings("unused")
 public class FlashImage extends Message {
     private final String type = "FlashImage";
     private final String imageId;//图片ID

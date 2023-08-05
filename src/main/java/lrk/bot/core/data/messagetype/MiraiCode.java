@@ -2,9 +2,10 @@ package lrk.bot.core.data.messagetype;
 
 import com.google.gson.JsonObject;
 
+@SuppressWarnings("unused")
 public class MiraiCode extends Message {
 	private final String type = "MiraiCode";
-	private String code = "";
+    private final String code;
 
 	public MiraiCode(String code) {
 		this.code = code;

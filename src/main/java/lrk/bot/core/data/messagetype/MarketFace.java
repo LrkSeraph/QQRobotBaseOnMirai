@@ -2,19 +2,22 @@ package lrk.bot.core.data.messagetype;
 
 import com.google.gson.JsonObject;
 
-//文件消息
+//商城表情
 
 @SuppressWarnings("unused")
-public class File extends Message {
-    private final String type = "File";
-    private final int id;
-    private final String name;
-    private final int size;
+public class MarketFace extends Message {
 
-    public File(int id, String name, int size) {
+    private final String type = "MarketFace";
+    private final int id;//唯一标识
+    private final String name;//表情名称
+
+    public MarketFace(int id, String name) {
         this.id = id;
         this.name = name;
-        this.size = size;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public int getId() {
@@ -25,20 +28,14 @@ public class File extends Message {
         return name;
     }
 
-    public int getSize() {
-        return size;
-    }
-
     @Override
     public String toString() {
         JsonObject data = new JsonObject();
         data.addProperty("type", type);
         data.addProperty("id", id);
         data.addProperty("name", name);
-        data.addProperty("size", size);
         return data.toString();
     }
-
 
     @Override
     public JsonObject toJsonObject() {
@@ -46,9 +43,6 @@ public class File extends Message {
         data.addProperty("type", type);
         data.addProperty("id", id);
         data.addProperty("name", name);
-        data.addProperty("size", size);
         return data;
     }
-
-
 }

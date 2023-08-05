@@ -2,10 +2,13 @@ package lrk.bot.core.data.messagetype;
 
 import com.google.gson.JsonObject;
 
+//消息元数据
+
+@SuppressWarnings("unused")
 public class Source extends Message {
 	private final String type = "Source";
-	private int id;//消息id
-	private int time;//消息时间戳
+    private final int id;//消息id
+    private final int time;//消息时间戳
 
 	public Source(int id, int time) {
 		this.id = id;

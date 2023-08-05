@@ -2,13 +2,16 @@ package lrk.bot.core.data.messagetype;
 
 import com.google.gson.*;
 
+//引用回复消息
+
+@SuppressWarnings("unused")
 public class Quote extends Message {
 	private final String type = "Quote";
-	private long id;//源消息id
-	private long groupId;//源消息接收的群号(好友为0)
-	private long senderId;//源消息的发送者
-	private long targetId;//源消息接收者QQ号
-	private JsonArray origin;//源消息内容
+    private final long id;//源消息id
+    private final long groupId;//源消息接收的群号(好友为0)
+    private final long senderId;//源消息的发送者
+    private final long targetId;//源消息接收者QQ号
+    private final JsonArray origin;//源消息内容
 
 	public Quote(long id, long groupId, long senderId, long targetId, JsonArray origin) {
 		this.id = id;

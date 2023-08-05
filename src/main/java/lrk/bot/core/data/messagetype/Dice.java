@@ -1,10 +1,13 @@
 package lrk.bot.core.data.messagetype;
-//未知类型
+
 import com.google.gson.*;
 
+//未知用途
+
+@SuppressWarnings("unused")
 public class Dice extends Message{
 	private final String type = "Dice";
-	private int value;
+    private final int value;
 	
 	public Dice(int value){
 		this.value = value;

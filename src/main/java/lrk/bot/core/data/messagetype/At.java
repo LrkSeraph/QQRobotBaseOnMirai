@@ -1,11 +1,14 @@
 package lrk.bot.core.data.messagetype;
-//@消息
+
 import com.google.gson.*;
 
+//@消息
+
+@SuppressWarnings("unused")
 public class At extends Message{
 	private final String type = "At";
-	private long target = 0;//要@的目标
-	private String display = "";//@的文本(名字),做为发送消息时无效
+    private final long target;//要@的目标
+	private final String display;//@的文本(名字),做为发送消息时无效
 	
 	public At(long target,String display){
 		this.target = target;
