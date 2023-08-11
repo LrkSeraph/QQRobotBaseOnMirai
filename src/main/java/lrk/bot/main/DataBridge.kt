@@ -1,6 +1,6 @@
 package lrk.bot.main
 
-import lrk.tools.miraiutils.Utils
+import lrk.tools.miraiutils.RobotImageBasedPlugin
 import java.io.*
 import java.nio.file.Files
 import java.util.*
@@ -150,7 +150,7 @@ object DataBridge {
 
     @JvmStatic
     @Throws(IOException::class)
-    fun getImage(util: Utils): String {
+    fun getImage(util: RobotImageBasedPlugin): String {
         val buffer = ByteArrayOutputStream()
         ImageIO.write(util.getImage(), "png", buffer)
         util.dispose()

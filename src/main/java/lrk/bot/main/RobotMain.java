@@ -3,11 +3,14 @@ package lrk.bot.main;
 import lrk.bot.core.event.Event;
 import lrk.bot.core.event.FriendMessageEvent;
 import lrk.bot.core.event.GroupMessageEvent;
+import lrk.bot.core.event.NudgeEvent;
 import lrk.bot.core.listener.EventHandler;
 import lrk.bot.core.listener.Listener;
 import lrk.bot.main.threads.FriendMessageThread;
 import lrk.bot.main.threads.GroupMessageThread;
+import lrk.bot.utils.MessageUtils;
 
+import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -33,6 +36,7 @@ public class RobotMain implements Listener {
                     RobotNotification.Info("FriendMessage: " + friendMessageEvent.getParams());
             case GroupMessageEvent groupMessageEvent ->
                     RobotNotification.Info("GroupMessage: " + groupMessageEvent.getParams());
+            case NudgeEvent nudgeEvent -> RobotNotification.Info("NudgeEvent: " + nudgeEvent.getParams());
             default -> throw new IllegalStateException("Unexpected value: " + event);
         }
     }
@@ -47,4 +51,9 @@ public class RobotMain implements Listener {
         threadPoolExecutor.submit(new GroupMessageThread(event));
     }
 
+    @EventHandler
+    public void onNudgeEvent(NudgeEvent event) throws IOException {
+        if (event.getKind() == NudgeEvent.Kind.Group && event.getTarget() == event.getBotCore().getQq() && event.getFromId() != event.getBotCore().getQq())
+            event.getBotCore().sendGroupMessage(event.getBotCore().nudge(MessageUtils.sendGroupNudge(event.getId(), event.getFromId())));
+    }
 }
