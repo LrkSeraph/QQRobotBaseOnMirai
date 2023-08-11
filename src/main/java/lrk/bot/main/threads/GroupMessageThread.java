@@ -27,7 +27,7 @@ public class GroupMessageThread extends RobotThread {
         try {
             core();
         } catch (Exception e1) {
-            RobotNotification.Warning(this.getClass().getName() + ":" + e1.getMessage());
+            RobotNotification.Warning(String.format("%s: %s", getClass().getName(), e1.getMessage()));
         }
     }
 
