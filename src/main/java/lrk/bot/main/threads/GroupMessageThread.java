@@ -1,14 +1,18 @@
 package lrk.bot.main.threads;
 
+import com.google.gson.JsonArray;
 import lrk.bot.core.data.messagetype.Image;
 import lrk.bot.core.event.GroupMessageEvent;
+import lrk.bot.main.AI;
 import lrk.bot.main.DataBridge;
 import lrk.bot.main.RobotNotification;
 import lrk.bot.utils.MessageUtils;
 import lrk.tools.miraiutils.Diu;
 import lrk.tools.miraiutils.Pa;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class GroupMessageThread extends RobotThread {
     GroupMessageEvent event;
@@ -32,9 +36,28 @@ public class GroupMessageThread extends RobotThread {
     }
 
     private void core() throws Exception {
-        event.getBotCore().nudge(MessageUtils.sendGroupNudge(event.getGroupID(),event.getSender()));
+        event.getBotCore().nudge(MessageUtils.sendGroupNudge(event.getGroupID(), event.getSender()));
+        AI:
         if (event.getAtUsers().contains(Long.parseLong(DataBridge.getRobotProp("QQ")))) {
             String message = event.getMessage().stripLeading();
+            if (message.equals("/cleanHistory")) {
+                AI.cleanHistory(event.getSenderID());
+                event.reply("OK");
+                System.out.println(AI.all_history.get(event.getSenderID()));
+                break AI;
+            }
+            AI ai = new AI(UUID.randomUUID().toString().substring(0, 10));
+            JsonArray context = AI.all_history.get(event.getSenderID());
+            ai.askSync(context == null ? new JsonArray() : context, message, (history, answer) -> {
+                try {
+                    event.reply(answer);
+                } catch (IOException e) {
+                    RobotNotification.Warning(this.getClass().getName() + ":" + e.getMessage());
+                }
+                while (history.toString().length() > 5000) history.remove(0);
+                AI.all_history.put(event.getSenderID(), history);
+            });
+
         }
         if (!event.getImages().isEmpty()) {
             for (Image img : event.getImages()) {

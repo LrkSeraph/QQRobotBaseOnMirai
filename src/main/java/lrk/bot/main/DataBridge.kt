@@ -81,8 +81,9 @@ object DataBridge {
         )
     }
 
+    @JvmStatic
     //初始化获取机器人关键参数
-    private fun initRobotProp(value: String, requireMessage: String, errorMessage: String) {
+    fun initRobotProp(value: String, requireMessage: String, errorMessage: String) {
         if (Robot_Properties[value] == null) {
             print(requireMessage)
             var v: String?
