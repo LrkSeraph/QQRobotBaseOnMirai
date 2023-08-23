@@ -7,6 +7,7 @@ import lrk.bot.core.data.MessageSourceType.*
 import lrk.bot.core.event.Event
 import lrk.bot.core.event.FriendMessageEvent
 import lrk.bot.core.event.GroupMessageEvent
+import lrk.bot.core.event.NudgeEvent
 import lrk.bot.core.listener.EventHandler
 import lrk.bot.core.listener.Listener
 import lrk.bot.main.DataBridge
@@ -24,7 +25,7 @@ open class BotCore private constructor(
     private var host: String,
     private var port: Int,
     private var verifyKey: String,
-    private var qq: Long
+    var qq: Long
 ) {
     private val listeners = ArrayList<Listener>()
     private var session: String
@@ -221,11 +222,15 @@ open class BotCore private constructor(
 
     //对收到的消息进行处理
     private fun handleMessage(message: JsonObject?) {
-        val messageSourceType = MessageSourceType.valueOf(message!!["data"].asJsonArray[0].asJsonObject["type"].asString)
+        val messageSourceType =
+            MessageSourceType.valueOf(message!!["data"].asJsonArray[0].asJsonObject["type"].asString)
         val data: JsonObject = message.getAsJsonArray("data")[0].asJsonObject
         when (messageSourceType) {
             FriendMessage -> callEvent(FriendMessageEvent(this, data))
             GroupMessage -> callEvent(GroupMessageEvent(this, data))
+            NudgeEvent -> {
+                callEvent(NudgeEvent(this, data))
+            }
             GroupRecallEvent -> {
                 RobotNotification.Info("GroupRecall: $data")
             }
@@ -274,7 +279,8 @@ open class BotCore private constructor(
     companion object DEFAULT :
         BotCore(
             DataBridge.getRobotProp("Port").split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0],
-            DataBridge.getRobotProp("Port").split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1].toInt(),
+            DataBridge.getRobotProp("Port").split(":".toRegex()).dropLastWhile { it.isEmpty() }
+                .toTypedArray()[1].toInt(),
             DataBridge.getRobotProp("MiraiApiHttpVerifyKey"),
             DataBridge.getRobotProp("QQ").toLong()
         )

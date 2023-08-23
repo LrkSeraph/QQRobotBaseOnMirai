@@ -4,6 +4,7 @@ import lrk.bot.core.BotCore;
 import lrk.bot.core.data.*;
 import lrk.bot.core.data.messagetype.*;
 import com.google.gson.JsonObject;
+import lrk.bot.main.RobotNotification;
 
 import java.io.IOException;
 
@@ -25,7 +26,7 @@ public abstract class MessageEvent extends Event {
         try {
             return reply(message);
         } catch (IOException e) {
-            e.printStackTrace();
+            RobotNotification.Warning(e.getMessage());
             return null;
         }
     }
@@ -33,7 +34,7 @@ public abstract class MessageEvent extends Event {
         try {
             return reply(message);
         } catch (IOException e) {
-            e.printStackTrace();
+            RobotNotification.Warning(e.getMessage());
             return null;
         }
     }

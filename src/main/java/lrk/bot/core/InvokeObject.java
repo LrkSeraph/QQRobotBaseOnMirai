@@ -1,6 +1,7 @@
 package lrk.bot.core;
 
 import lrk.bot.core.listener.EventHandler;
+import lrk.bot.main.RobotNotification;
 
 import java.lang.reflect.Method;
 
@@ -23,7 +24,7 @@ class InvokeObject {
             method.setAccessible(true);
             method.invoke(object, params);
         } catch (Exception e) {
-            e.printStackTrace();
+            RobotNotification.Warning(String.format("%s: %s", getClass().getName(), e.getMessage()));
         }
     }
 
