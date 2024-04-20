@@ -24,7 +24,7 @@ class InvokeObject {
             method.setAccessible(true);
             method.invoke(object, params);
         } catch (Exception e) {
-            RobotNotification.Warning(String.format("%s: %s", getClass().getName(), e.getMessage()));
+            RobotNotification.Warning(String.format("%s->%s: %s", getClass().getName(), e.getClass().getName(), e.getMessage()));
         }
     }
 

@@ -15,12 +15,12 @@ public class RobotNotification {
     private static FileHandler fileHandler;
 
     static {
-        logs = new File(DataBridge.getHOME().getPath() + "/robot.log");
+        logs = new File("%s/robot.log".formatted(DataBridge.getHOME().getPath()));
         mode = Mode.valueOf(DataBridge.getRobotProp("Mode"));
         formatter = new RobotLogFormatter();
         CONSOLE_HANDLER = new ConsoleHandler();
         try {
-            fileHandler = new FileHandler(DataBridge.getHOME().getPath() + "/robot.log", true);
+            fileHandler = new FileHandler("%s/robot.log".formatted(DataBridge.getHOME().getPath()), true);
         } catch (IOException ignored) {
         }
         CONSOLE_HANDLER.setFormatter(formatter);
@@ -28,7 +28,7 @@ public class RobotNotification {
         logger.addHandler(CONSOLE_HANDLER);
         logger.addHandler(fileHandler);
         try (FileOutputStream fileOutputStream = new FileOutputStream(logs, true)) {
-            fileOutputStream.write(("---------------" + new Date() + "---------------\n").getBytes());
+            fileOutputStream.write(("---------------%s---------------\n".formatted(new Date())).getBytes());
         } catch (IOException e) {
             RobotNotification.Warning("IO Error: Log Write Failed");
             System.exit(1);
@@ -78,7 +78,7 @@ class RobotLogFormatter extends Formatter {
 
     @Override
     public String format(LogRecord p1) {
-        return "[" + p1.getLevel() + "]\t" + p1.getMessage() + "\n";
+        return "[%s]\t%s\n".formatted(p1.getLevel(), p1.getMessage());
     }
 
 

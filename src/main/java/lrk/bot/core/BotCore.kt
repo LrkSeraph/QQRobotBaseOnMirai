@@ -16,7 +16,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.lang.reflect.Modifier
 import java.net.HttpURLConnection
-import java.net.URL
+import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.util.*
 import kotlin.system.exitProcess
@@ -50,8 +50,8 @@ open class BotCore private constructor(
                             handleMessage(message)
                         }
                     }
-                } catch (e1: Exception) {
-                    RobotNotification.Warning("${this.javaClass.name} : ${e1.message}")
+                } catch (e: Exception) {
+                    RobotNotification.Warning("${javaClass.name}->${e.javaClass.getName()}: ${e.message}")
                 }
             }
         }, 0, 100)
@@ -60,7 +60,7 @@ open class BotCore private constructor(
 
     @Throws(IOException::class)
     fun getMessageCount(): Int {
-        val url = URL("http://$host:$port/countMessage?sessionKey=$session")
+        val url = URI("http://$host:$port/countMessage?sessionKey=$session").toURL()
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "GET"
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
@@ -78,7 +78,7 @@ open class BotCore private constructor(
 
     @Throws(IOException::class)
     fun getNextMessage(): JsonObject? {
-        val url = URL("http://$host:$port/fetchMessage?sessionKey=$session&count=1")
+        val url = URI("http://$host:$port/fetchMessage?sessionKey=$session&count=1").toURL()
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "GET"
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
@@ -97,7 +97,7 @@ open class BotCore private constructor(
     //登录验证
     @Throws(IOException::class)
     private fun verify(): String {
-        val url = URL("http://$host:$port/verify")
+        val url = URI("http://$host:$port/verify").toURL()
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "POST"
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
@@ -117,7 +117,7 @@ open class BotCore private constructor(
     //绑定SessionKey和QQ
     @Throws(IOException::class)
     private fun bind(): String {
-        val url = URL("http://$host:$port/bind")
+        val url = URI("http://$host:$port/bind").toURL()
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "POST"
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
@@ -138,7 +138,7 @@ open class BotCore private constructor(
     //发送好友消息
     @Throws(IOException::class)
     fun sendFriendMessage(data: JsonObject): JsonObject {
-        val url = URL("http://$host:$port/sendFriendMessage")
+        val url = URI("http://$host:$port/sendFriendMessage").toURL()
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "POST"
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
@@ -155,7 +155,7 @@ open class BotCore private constructor(
     //发送群消息
     @Throws(IOException::class)
     fun sendGroupMessage(data: JsonObject): JsonObject {
-        val url = URL("http://$host:$port/sendGroupMessage")
+        val url = URI("http://$host:$port/sendGroupMessage").toURL()
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "POST"
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
@@ -172,7 +172,7 @@ open class BotCore private constructor(
     //戳一戳
     @Throws(IOException::class)
     fun nudge(data: JsonObject): JsonObject {
-        val url = URL("http://$host:$port/sendNudge")
+        val url = URI("http://$host:$port/sendNudge").toURL()
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "POST"
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
@@ -189,7 +189,7 @@ open class BotCore private constructor(
     //撤回消息
     @Throws(IOException::class)
     fun recall(data: JsonObject): JsonObject {
-        val url = URL("http://$host:$port/recall")
+        val url = URI("http://$host:$port/recall").toURL()
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "POST"
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
@@ -206,7 +206,7 @@ open class BotCore private constructor(
     //撤回消息
     @Throws(IOException::class)
     fun mute(data: JsonObject): JsonObject {
-        val url = URL("http://$host:$port/mute")
+        val url = URI("http://$host:$port/mute").toURL()
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "POST"
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8")

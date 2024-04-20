@@ -4,16 +4,17 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Objects;
 
 public class Pa implements RobotImageBasedPlugin {
 
     private BufferedImage logo, image;
 
-    public Pa(long qq) throws IOException {
-        logo = ImageIO.read(new URL("https://q1.qlogo.cn/g?b=qq&nk=" + qq + "&s=640"));
-        image = ImageIO.read(Objects.requireNonNull(Pa.class.getResourceAsStream("/assets/image/爬/爬" + (int) (Math.random() * 53) + ".jpg")));
+    public Pa(long qq) throws IOException, URISyntaxException {
+        logo = ImageIO.read(new URI("https://q1.qlogo.cn/g?b=qq&nk=%d&s=640".formatted(qq)).toURL());
+        image = ImageIO.read(Objects.requireNonNull(Pa.class.getResourceAsStream("/assets/image/爬/爬%d.jpg".formatted((int) (Math.random() * 53)))));
     }
 
     public BufferedImage getImage() {

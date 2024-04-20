@@ -12,6 +12,8 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -52,7 +54,7 @@ public class AI extends WebSocketListener {
     boolean finished = false;
 
     // 构造函数
-    public AI(String userId) throws MalformedURLException, NoSuchAlgorithmException, InvalidKeyException {
+    public AI(String userId) throws MalformedURLException, NoSuchAlgorithmException, InvalidKeyException, URISyntaxException {
         this.userId = userId;
         String authUrl = getAuthUrl();
         client = new OkHttpClient.Builder().build();
@@ -109,16 +111,14 @@ public class AI extends WebSocketListener {
     }
 
     // 鉴权方法
-    private String getAuthUrl() throws MalformedURLException, NoSuchAlgorithmException, InvalidKeyException {
-        URL url = new URL(AI.hostUrl);
+    private String getAuthUrl() throws MalformedURLException, NoSuchAlgorithmException, InvalidKeyException, URISyntaxException {
+        URL url = new URI(AI.hostUrl).toURL();
         // 时间
         SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
         format.setTimeZone(TimeZone.getTimeZone("GMT"));
         String date = format.format(new Date());
         // 拼接
-        String preStr = "host: " + url.getHost() + "\n" +
-                "date: " + date + "\n" +
-                "GET " + url.getPath() + " HTTP/1.1";
+        String preStr = "host: %s\ndate: %s\nGET %s HTTP/1.1".formatted(url.getHost(), date, url.getPath());
         // SHA256加密
         Mac mac = Mac.getInstance("hmacsha256");
         SecretKeySpec spec = new SecretKeySpec(AI.apiSecret.getBytes(StandardCharsets.UTF_8), "hmacsha256");
@@ -130,11 +130,11 @@ public class AI extends WebSocketListener {
         // 拼接
         String authorization = String.format("api_key=\"%s\", algorithm=\"%s\", headers=\"%s\", signature=\"%s\"", AI.apiKey, "hmac-sha256", "host date request-line", sha);
         // 拼接地址
-        HttpUrl httpUrl = Objects.requireNonNull(HttpUrl.parse("https://" + url.getHost() + url.getPath())).newBuilder().//
-                addQueryParameter("authorization", Base64.getEncoder().encodeToString(authorization.getBytes(StandardCharsets.UTF_8))).//
-                addQueryParameter("date", date).//
-                addQueryParameter("host", url.getHost()).//
-                build();
+        HttpUrl httpUrl = Objects.requireNonNull(HttpUrl.parse("https://%s%s".formatted(url.getHost(), url.getPath()))).newBuilder()
+                .addQueryParameter("authorization", Base64.getEncoder().encodeToString(authorization.getBytes(StandardCharsets.UTF_8)))
+                .addQueryParameter("date", date)
+                .addQueryParameter("host", url.getHost())
+                .build();
         return httpUrl.toString();
     }
 
@@ -168,7 +168,7 @@ public class AI extends WebSocketListener {
             try {
                 webSocket.send(json.toString());
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                e.printStackTrace(System.out);
             }
         }).start();
     }
@@ -177,8 +177,8 @@ public class AI extends WebSocketListener {
     public void onMessage(@NotNull WebSocket webSocket, @NotNull String text) {
         JsonParse myJsonParse = gson.fromJson(text, JsonParse.class);
         if (myJsonParse.header.code != 0) {
-            System.out.println("发生错误，错误码为：" + myJsonParse.header.code);
-            System.out.println("本次请求的sid为：" + myJsonParse.header.sid);
+            System.out.printf("发生错误，错误码为：%d%n", myJsonParse.header.code);
+            System.out.printf("本次请求的sid为：%s%n", myJsonParse.header.sid);
             webSocket.close(1000, "");
         }
         List<Text> textList = myJsonParse.payload.choices.text;
@@ -200,17 +200,15 @@ public class AI extends WebSocketListener {
         try {
             if (null != response) {
                 int code = response.code();
-                System.out.println("onFailure code:" + code);
-                if (response.body() != null) {
-                    System.out.println("onFailure body:" + response.body().string());
-                }
+                System.out.printf("onFailure code:%d%n", code);
+                System.out.printf("onFailure body:%s%n", response.body().string());
                 if (101 != code) {
                     System.out.println("connection failed");
                     System.exit(0);
                 }
             }
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace(System.out);
         }
     }
 

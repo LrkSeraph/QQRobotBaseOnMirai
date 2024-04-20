@@ -7,27 +7,22 @@ import lrk.bot.main.RobotNotification;
 import lrk.tools.miraiutils.Diu;
 import lrk.tools.miraiutils.Pa;
 
-import java.io.IOException;
-
 public class FriendMessageThread extends RobotThread{
 	FriendMessageEvent event;
 	public FriendMessageThread(FriendMessageEvent event){
 		this.event = event;
-		onStart();
 	}
 	@Override
 	public void run(){
 		try{
 			core();
-		}catch(IOException e1){
-            RobotNotification.Warning(String.format("%s: %s", getClass().getName(), e1.getMessage()));
+		} catch (Exception e) {
+			RobotNotification.Warning(String.format("%s->%s: %s", getClass().getName(), e.getClass().getName(), e.getMessage()));
 		}
 	}
-	private void core() throws IOException{
+
+	private void core() throws Exception {
 		String message = event.getMessage();
-		if (message.startsWith("/RandomPic")) {
-			event.reply(new Image(null, "https://iw233.cn/API/Random.php", null, null));
-		}
 		if (message.startsWith("/爬")) {
 			event.reply(new Image(null, null, null, DataBridge.getImage(new Pa(Long.parseLong(message.split("@")[1])))));
 		}

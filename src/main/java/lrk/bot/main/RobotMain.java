@@ -33,11 +33,11 @@ public class RobotMain implements Listener {
     public void onEvent(Event event) {
         switch (event) {
             case FriendMessageEvent friendMessageEvent ->
-                    RobotNotification.Info("FriendMessage: " + friendMessageEvent.getParams());
+                    RobotNotification.Info("FriendMessage: %s".formatted(friendMessageEvent.getParams()));
             case GroupMessageEvent groupMessageEvent ->
-                    RobotNotification.Info("GroupMessage: " + groupMessageEvent.getParams());
-            case NudgeEvent nudgeEvent -> RobotNotification.Info("NudgeEvent: " + nudgeEvent.getParams());
-            default -> throw new IllegalStateException("Unexpected value: " + event);
+                    RobotNotification.Info("GroupMessage: %s".formatted(groupMessageEvent.getParams()));
+            case NudgeEvent nudgeEvent -> RobotNotification.Info("NudgeEvent: %s".formatted(nudgeEvent.getParams()));
+            default -> throw new IllegalStateException("Unexpected value: %s".formatted(event));
         }
     }
 

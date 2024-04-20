@@ -42,7 +42,7 @@ object DataBridge {
             }
 
             else -> {
-                print("Not Linux/Android")
+                println("Not Linux/Android")
                 exitProcess(1)
             }
         }
@@ -85,7 +85,7 @@ object DataBridge {
     //初始化获取机器人关键参数
     fun initRobotProp(value: String, requireMessage: String, errorMessage: String) {
         if (Robot_Properties[value] == null) {
-            print(requireMessage)
+            println(requireMessage)
             var v: String?
             if (Console.next().also { v = it } == null) {
                 println(errorMessage)

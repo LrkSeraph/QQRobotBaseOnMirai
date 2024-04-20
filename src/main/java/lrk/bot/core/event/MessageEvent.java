@@ -26,7 +26,7 @@ public abstract class MessageEvent extends Event {
         try {
             return reply(message);
         } catch (IOException e) {
-            RobotNotification.Warning(e.getMessage());
+            RobotNotification.Warning(String.format("%s->%s: %s", getClass().getName(), e.getClass().getName(), e.getMessage()));
             return null;
         }
     }
@@ -34,7 +34,7 @@ public abstract class MessageEvent extends Event {
         try {
             return reply(message);
         } catch (IOException e) {
-            RobotNotification.Warning(e.getMessage());
+            RobotNotification.Warning(String.format("%s->%s: %s", getClass().getName(), e.getClass().getName(), e.getMessage()));
             return null;
         }
     }
@@ -49,9 +49,6 @@ public abstract class MessageEvent extends Event {
     
     @Override
     public String toString() {
-        return "MessageEvent{" +
-                "senderID=" + senderID +
-                ", message='" + message + '\'' +
-                '}';
+        return "MessageEvent{senderID=%d, message='%s'}".formatted(senderID, message);
     }
 }

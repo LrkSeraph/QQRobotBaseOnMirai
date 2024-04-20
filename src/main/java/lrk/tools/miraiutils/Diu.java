@@ -4,15 +4,16 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Objects;
 
 public class Diu implements RobotImageBasedPlugin {
 
     BufferedImage logo, image;
 
-    public Diu(long qq) throws IOException {
-        logo = ImageIO.read(new URL("https://q1.qlogo.cn/g?b=qq&nk=" + qq + "&s=100"));
+    public Diu(long qq) throws IOException, URISyntaxException {
+        logo = ImageIO.read(new URI("https://q1.qlogo.cn/g?b=qq&nk=%d&s=100".formatted(qq)).toURL());
         image = ImageIO.read(Objects.requireNonNull(Diu.class.getResourceAsStream("/assets/image/丢/diu.png")));
     }
 

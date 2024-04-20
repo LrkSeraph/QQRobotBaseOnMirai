@@ -72,11 +72,6 @@ public class FriendMessageEvent extends MessageEvent {
 
     @Override
     public String toString() {
-        return "FriendMessageEvent{" +
-                "message=" + message +
-                ", images=" + images +
-                ", flashImages=" + flashImages +
-                ", messageID=" + messageID +
-                '}';
+        return "FriendMessageEvent{message=%s, images=%s, flashImages=%s, messageID=%d}".formatted(message, images, flashImages, messageID);
     }
 }

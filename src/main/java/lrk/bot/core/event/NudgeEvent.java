@@ -40,11 +40,6 @@ public class NudgeEvent extends OtherEvent {
 
     @Override
     public String toString() {
-        return "NudgeEvent{" +
-                "fromId=" + fromId +
-                ", target=" + target +
-                ", kind=" + kind +
-                ", id=" + id +
-                '}';
+        return "NudgeEvent{fromId=%d, target=%d, kind=%s, id=%d}".formatted(fromId, target, kind, id);
     }
 }

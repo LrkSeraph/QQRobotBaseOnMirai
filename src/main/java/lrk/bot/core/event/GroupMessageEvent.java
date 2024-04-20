@@ -119,17 +119,6 @@ public class GroupMessageEvent extends MessageEvent {
 
     @Override
     public String toString() {
-        return "GroupMessageEvent{" +
-                "groupID=" + groupID +
-                ", groupNickName='" + groupNickName + '\'' +
-                ", senderID=" + senderID +
-                ", senderNickName='" + senderNickName + '\'' +
-                ", atUsers=" + atUsers +
-                ", pictures=" + images +
-                ", message=" + message +
-                ", messageId=" + messageId +
-                ", messageTime=" + messageTime +
-                ", app=" + app +
-                '}';
+        return "GroupMessageEvent{groupID=%d, groupNickName='%s', senderID=%d, senderNickName='%s', atUsers=%s, pictures=%s, message=%s, messageId=%d, messageTime=%d, app=%s}".formatted(groupID, groupNickName, senderID, senderNickName, atUsers, images, message, messageId, messageTime, app);
     }
 }
